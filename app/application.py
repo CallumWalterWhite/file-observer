@@ -3,6 +3,7 @@ from tkinter import ttk, simpledialog
 import uuid
 from .model import TagPath, Logs, db
 from .watcher import Watcher
+import os
 
 class FolderApp:
     def __init__(self, root):
@@ -86,6 +87,25 @@ class FolderApp:
 
         edit_button = ttk.Button(self.tags_frame, text="Edit", command=lambda: self.edit_row(tree))
         edit_button.pack(side=tk.LEFT, padx=10)
+
+        auto_tag = ttk.Button(self.tags_frame, text="Auto Tag", command=lambda: self.auto_tag(tree))
+        auto_tag.pack(side=tk.LEFT, padx=10)
+
+    def auto_tag(self, tree):
+        source_path = simpledialog.askstring("Auto Tag", "Enter Source Path:")
+        target_path = simpledialog.askstring("Auto Tag", "Enter Target path for tagging:")
+        lowest_level_directories = []
+        for root, dirs, files in os.walk(target_path):
+            if not dirs:
+                lowest_level_directories.append(root)
+        for path in lowest_level_directories:
+            base = os.path.basename(os.path.normpath(path))
+            id = uuid.uuid4()
+            tag = TagPath.create(id=id, sourcepath=source_path, tags=base, targetpath=path)
+            tree.insert("", "end", values=(id, source_path, base, path))
+        self.tags = TagPath.select()
+        self.refresh_w = True
+        self.refresh_watches()
 
     def add_row(self, tree):
         source_path = simpledialog.askstring("Add Row", "Enter Source Path:")
