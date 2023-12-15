@@ -1,3 +1,4 @@
-tk
 watchdog
 peewee
+customtkinter
+packaging

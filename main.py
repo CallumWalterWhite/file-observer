@@ -1,7 +1,8 @@
-import tkinter as tk
+from tkinter import *
+import customtkinter
 from app import FolderApp
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = customtkinter.CTk()
     app = FolderApp(root)
     root.mainloop()
