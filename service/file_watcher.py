@@ -4,7 +4,7 @@ from watchdog.events import PatternMatchingEventHandler
 import shutil
 import re
 import os
-from common.file_tag_mover import FileMover
+from service.file_tag_mover import FileMover
 
 class FileWatcher:
     def __init__(self, source, tags, target, meta_id=None, callback=None):

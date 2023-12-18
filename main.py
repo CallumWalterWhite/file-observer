@@ -1,10 +1,8 @@
 from tkinter import *
 import customtkinter
-from app.main import FolderApp
-from service.main import main
+from app.folder_app import FolderApp
 
 if __name__ == "__main__":
-    main()
     root = customtkinter.CTk()
     app = FolderApp(root)
     root.mainloop()
