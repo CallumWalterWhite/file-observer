@@ -2,3 +2,5 @@ watchdog
 peewee
 customtkinter
 packaging
+pywin32
+ttkthemes

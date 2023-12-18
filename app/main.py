@@ -7,7 +7,7 @@ import uuid
 from .model import TagPath, Logs, db
 from .file_watcher import FileWatcher, create_watcher_process
 import os
-from .file_tag_mover import FileMover
+from common.file_tag_mover import FileMover
 
 class FolderApp:
     def __init__(self, root):
