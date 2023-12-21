@@ -6,7 +6,6 @@ FileSorter is a Python application designed to automate the tagging and organiza
 Created this because it was a pain to keep track of my downloads folder and etc, so keeps everying clean.
 
 ## WIP
-Need to create background processes and also mass sorts - everything is currently event based with observables on the paths once the application is running.
-
-Oh.. and make it work for MacOS
+make it work for MacOS
+working on install
 
