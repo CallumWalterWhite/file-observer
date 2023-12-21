@@ -203,3 +203,9 @@ class FolderApp:
     
     def get_list_logs(self):
         return self._send_command_request('logs')
+    
+if __name__ == "__main__":
+    customtkinter.set_appearance_mode("dark")
+    root = customtkinter.CTk()
+    app = FolderApp(root)
+    root.mainloop()
