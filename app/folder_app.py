@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import customtkinter
 from app.tcp_client import TCPClient
+from .ui.master_gui import MasterGUI
 from .components import show_custom_dialog
 import uuid
 import os
@@ -205,7 +206,5 @@ class FolderApp:
         return self._send_command_request('logs')
     
 if __name__ == "__main__":
-    customtkinter.set_appearance_mode("dark")
-    root = customtkinter.CTk()
-    app = FolderApp(root)
-    root.mainloop()
+    app = MasterGUI()
+    app.mainloop()
