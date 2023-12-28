@@ -4,7 +4,8 @@ from watchdog.events import PatternMatchingEventHandler
 import shutil
 import re
 import os
-from service.file_tag_mover import FileMover
+from service.file_watcher.file_mover import FileMover
+
 
 class FileWatcher:
     def __init__(self, source, tags, target, meta_id=None, callback=None):
@@ -13,19 +14,16 @@ class FileWatcher:
         ignore_patterns = None
         ignore_directories = False
         case_sensitive = False
-
-        my_event_handler = PatternMatchingEventHandler(
+        event_handler = PatternMatchingEventHandler(
             patterns, ignore_patterns, ignore_directories, case_sensitive
         )
-        my_event_handler.on_created = self.on_created
-        my_event_handler.on_modified = self.on_modified
-        my_event_handler.on_moved = self.on_moved
-
+        event_handler.on_created = self.on_created
+        event_handler.on_modified = self.on_modified
+        event_handler.on_moved = self.on_moved
         path = source
         go_recursively = True
-
         self.observer = Observer()
-        self.observer.schedule(my_event_handler, path, recursive=go_recursively)
+        self.observer.schedule(event_handler, path, recursive=go_recursively)
         self.observer.start()
         self.file_mover = FileMover(source, tags, target)
         self.meta_id = meta_id
