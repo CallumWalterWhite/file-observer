@@ -40,9 +40,11 @@ class ConditionValue(BaseModel):
 class RuleOperation(BaseModel):
     Id = UUIDField(primary_key=True)
     RuleId = UUIDField()
-    Operator: CharField()
+    Action: CharField()
+    ActionValue: CharField()
 
 class Logs(BaseModel):
     Id = UUIDField(primary_key=True)
+    rule_id = UUIDField()
     text = CharField()
     timestamp = TimestampField()

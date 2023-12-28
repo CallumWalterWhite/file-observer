@@ -2,7 +2,7 @@ import win32event
 import win32service
 import win32serviceutil
 import servicemanager
-from service.file_watcher_client import FileWatcherClient
+from service.service_server import ServiceServer
 
 class FileSorterWatcherWindowService(win32serviceutil.ServiceFramework):
     _svc_name_ = 'FileSorterWatcherService'
@@ -12,7 +12,7 @@ class FileSorterWatcherWindowService(win32serviceutil.ServiceFramework):
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
-        self.client = FileWatcherClient()
+        self.client = ServiceServer()
 
     def SvcStop(self):
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)

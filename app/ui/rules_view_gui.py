@@ -31,6 +31,7 @@ class RuleViewGUI(customtkinter.CTkFrame):
 
         self.tags = self.master.folder_service_adapter.get_list_tag_path()
         for row in self.tags:
+            print(row)
             tree.insert("", "end", values=(row['id'], row['sourcepath'], row['tags'], row['targetpath']))
 
         tree.pack(padx=10, pady=20, fill=tk.BOTH, expand=True)
