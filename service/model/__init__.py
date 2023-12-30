@@ -1,8 +1,13 @@
+from uuid import UUID
 from peewee import *
+import json
 db = SqliteDatabase('foldersorter.db')
 class BaseModel(Model):
     class Meta:
         database = db
+    def toJSON(self):
+        new_data = {key: str(value) if isinstance(value, UUID) else value for key, value in self.__dict__.get('__data__', {}).items()}
+        return json.dumps(new_data)
 
 class TagPath(BaseModel):
     id = UUIDField(primary_key=True)

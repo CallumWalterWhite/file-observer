@@ -1,3 +1,4 @@
+import json
 from typing import List, Optional
 from service.model import Rule, RuleMonitor, RuleOperation, db
 import uuid
@@ -10,23 +11,28 @@ def public(func):
     setattr(func, 'is_public', True)
     return func
 
-class RuleDto:
+class BaseDto(object):
+    def toJSON(self):
+        new_data = {key: str(value) if isinstance(value, uuid.UUID) else value for key, value in self.__dict__.get('__data__', {}).items()}
+        return json.dumps(new_data)
+
+class RuleDto(BaseDto):
     id: Optional[str]
     description: str
     
-class RuleMonitorDto:
+class RuleMonitorDto(BaseDto):
     id: Optional[str]
     ruleid: str
     sourcepath: str
     subfolder: bool
     
-class RuleOperationDto:
+class RuleOperationDto(BaseDto):
     id: Optional[str]
     ruleid: str
     action: str
     action_value: str
     
-class RuleAggregateDto:
+class RuleAggregateDto(BaseDto):
     id: Optional[str]
     description: str
     rulemonitors: List[RuleMonitorDto]
@@ -64,36 +70,40 @@ class RuleService(object):
         for rule in rules:
             monitors = RuleMonitor.select().where(RuleMonitor.RuleId == rule.Id)
             operations = RuleOperation.select().where(RuleOperation.RuleId == rule.Id)
+
             rule_monitors = [
-                RuleMonitorDto(
-                    id=str(monitor.Id),
-                    ruleid=str(monitor.RuleId),
-                    sourcepath=monitor.SourcePath,
-                    subfolder=monitor.Subfolder
-                ) for monitor in monitors
+                {
+                    'id': str(monitor.Id),
+                    'ruleid': str(monitor.RuleId),
+                    'sourcepath': monitor.SourcePath,
+                    'subfolder': monitor.Subfolder
+                } for monitor in monitors
             ]
+
             rule_operations = [
-                RuleOperationDto(
-                    id=str(op.Id),
-                    ruleid=str(op.RuleId),
-                    action=op.Action,
-                    action_value=op.ActionValue
-                ) for op in operations
+                {
+                    'id': str(op.Id),
+                    'ruleid': str(op.RuleId),
+                    'action': op.Action,
+                    'action_value': op.ActionValue
+                } for op in operations
             ]
-            rule_aggregate = RuleAggregateDto(
-                id=str(rule.Id),
-                description=rule.Description,
-                rulemonitors=rule_monitors,
-                ruleoperations=rule_operations
-            )
+
+            rule_aggregate = {
+                'id': str(rule.Id),
+                'description': rule.Description,
+                'rulemonitors': rule_monitors,
+                'ruleoperations': rule_operations
+            }
+
             rule_aggregate_list.append(rule_aggregate)
 
         return rule_aggregate_list
-    
+
     @public
     def create_rule(self, body):
         rule_dto: RuleDto = ObjectMapper.map(body, RuleDto)
-        rule = Rule.create(Id=uuid.uuid4(), Description=rule_dto.description)
+        rule = Rule.create(Id=uuid.uuid4(), Description=rule_dto.Description)
         return rule
     
     @public

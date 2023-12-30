@@ -1,6 +1,7 @@
 from .custom_dialog import CustomDialog
 from .folder_selector import FolderSelector
 from .custom_table import CustomTable
+from .icons import get_plus_icon
 from ttkthemes import ThemedTk
 import customtkinter
 

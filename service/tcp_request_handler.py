@@ -20,17 +20,24 @@ class TCPRequestHandler:
             self.request_handlers[method_name] = method
         
     def handle_client(self, client_socket, client_address):
-        request = client_socket.recv(1024)
+        request = client_socket.recv(65000)
         request_body = request.decode('utf-8')
         print(f"Received request: {request_body}")
         request_json = json.loads(request_body)
         request_command = request_json['command']
         if request_command in self.request_handlers:
-            if 'body' in request_json:
-                response = self.request_handlers[request_command](request_json['body'])
-            else:
-                response = self.request_handlers[request_command]()
-            client_socket.send(json.dumps(response).encode('utf-8'))
+            try:
+                if 'body' in request_json:
+                    response = self.request_handlers[request_command](request_json['body'])
+                else:
+                    response = self.request_handlers[request_command]()
+                if hasattr(response, 'toJSON') and callable(getattr(response, 'toJSON')):
+                    response_data = response.toJSON()
+                else:
+                    response_data = json.dumps(response)
+                client_socket.send(response_data.encode('utf-8'))
+            except Exception as e:
+                client_socket.send(json.dumps({'status': 500,'error': str(e)}).encode('utf-8'))
         else:
             client_socket.send("Unknown request type".encode('utf-8'))
         client_socket.close()

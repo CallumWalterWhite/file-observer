@@ -27,7 +27,7 @@ class TCPClient:
             raise RuntimeError("Socket not connected. Call connect() first.")
 
         try:
-            response = self.socket.recv(1024)
+            response = self.socket.recv(65000)
             return response.decode('utf-8')
         except Exception as e:
             raise RuntimeError(f"Error receiving response: {str(e)}")

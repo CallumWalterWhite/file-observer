@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox
 import customtkinter
-
+from app.folder_service_adapter import FolderServiceAdapter
 from .rules_view_gui import RuleViewGUI
 from .home_gui import HomeGUI
 from .logs_gui import LogsGUI
@@ -12,9 +12,9 @@ customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
 class MasterGUI(customtkinter.CTk):
-    def __init__(self, folder_service_adapter):
+    def __init__(self):
         super().__init__()
-        self.folder_service_adapter = folder_service_adapter
+        self.folder_service_adapter = FolderServiceAdapter()
         # configure window
         self.title("File Observer")
         self.geometry("1280x960")
