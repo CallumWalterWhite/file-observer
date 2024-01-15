@@ -1,6 +1,6 @@
 import json
 from typing import List, Optional
-from service.model import Rule, RuleMonitor, RuleOperation, db
+from service.model import Rule, RuleMonitor, RuleOperation, RuleCondition, db
 import uuid
 from service.file_watcher_manager import FileWatcherManager
 from service.object_mapper import ObjectMapper
@@ -19,6 +19,7 @@ class BaseDto(object):
 class RuleDto(BaseDto):
     id: Optional[str]
     description: str
+    start: bool
     
 class RuleMonitorDto(BaseDto):
     id: Optional[str]
@@ -26,6 +27,14 @@ class RuleMonitorDto(BaseDto):
     sourcepath: str
     subfolder: bool
     
+class RuleConditionDto(BaseDto):
+    id: Optional[str]
+    ruleid: str
+    operator: str
+    operator_base: str
+    value_type: str
+    value: str
+
 class RuleOperationDto(BaseDto):
     id: Optional[str]
     ruleid: str
@@ -103,7 +112,7 @@ class RuleService(object):
     @public
     def create_rule(self, body):
         rule_dto: RuleDto = ObjectMapper.map(body, RuleDto)
-        rule = Rule.create(Id=uuid.uuid4(), Description=rule_dto.Description)
+        rule = Rule.create(Id=uuid.uuid4(), Description=rule_dto.description)
         return rule
     
     @public
@@ -135,4 +144,16 @@ class RuleService(object):
         rule_operation_dto: RuleOperationDto = ObjectMapper.map(body, RuleOperationDto)
         rule_operation = RuleMonitor.update(RuleId=rule_operation_dto.ruleid, Action=rule_operation_dto.action, ActionValue=rule_operation_dto.action_value).where(RuleMonitor.Id == rule_operation_dto.id)
         return rule_operation
+    
+    @public
+    def create_rule_condition(self, body):
+        rule_condition_dto: RuleConditionDto = ObjectMapper.map(body, RuleConditionDto)
+        rule_condition = RuleCondition.create(Id=uuid.uuid4(), RuleId=rule_condition_dto.ruleid, Base=rule_condition_dto.operator_base, Operator=rule_condition_dto.operator, Type=rule_condition_dto.value_type, Value=rule_condition_dto.value)
+        return rule_condition
+    
+    @public
+    def update_rule_condition(self, body):
+        rule_condition_dto: RuleConditionDto = ObjectMapper.map(body, RuleConditionDto)
+        rule_condition = RuleMonitor.update(RuleId=rule_condition_dto.ruleid, Base=rule_condition_dto.operator_base, Operator=rule_condition_dto.operator, Type=rule_condition_dto.value_type, Value=rule_condition_dto.value).where(RuleMonitor.Id == rule_condition_dto.id)
+        return rule_condition
         

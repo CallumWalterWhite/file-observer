@@ -24,21 +24,47 @@ class RuleViewSingleWindowGUI(customtkinter.CTkToplevel):
         rule_description_entry = self.add_field('Rule_Description', tk.Entry, group='rf', auto_pos=False, width=100)
         rule_description_entry.grid(row=0, column=1, padx=5, pady=5, sticky="w")
         
+        #Montior
         rule_monitor_label = customtkinter.CTkLabel(self, text='Monitor', font=customtkinter.CTkFont(size=20, weight="bold"))
         rule_monitor_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         rule_monitor_canvas = customtkinter.CTkCanvas(self)
         rule_monitor_canvas.grid(row=2, column=1)
         self.monitor_fields = 3
+        self.subfolder_check_box = {}
         self.add_rule_monitor_fields(rule_monitor_canvas)
         rule_monitor_canvas.bind("<Configure>", lambda event: self.resize_box(rule_monitor_canvas, event))
-        plus_icon = get_plus_icon(self)
-        rule_monitor_plus_button = tk.Button(rule_monitor_canvas, image=plus_icon, width=50, height=50, command=lambda: self.add_rule_monitor_fields(rule_monitor_canvas))
-        rule_monitor_plus_button.image = plus_icon
+        monitor_plus_icon = get_plus_icon(self)
+        rule_monitor_plus_button = tk.Button(rule_monitor_canvas, image=monitor_plus_icon, width=50, height=50, command=lambda: self.add_rule_monitor_fields(rule_monitor_canvas))
+        rule_monitor_plus_button.image = monitor_plus_icon
         rule_monitor_canvas.create_window(10, 10, window=rule_monitor_plus_button, anchor=tk.NW)
         
-        self.add_rule_conditon_fields()
-        self.add_rule_operation_fields()
-
+        #Condition
+        rule_condition_label = customtkinter.CTkLabel(self, text='Conditions', font=customtkinter.CTkFont(size=20, weight="bold"))
+        rule_condition_label.grid(row=4, column=0, padx=5, pady=15, sticky="w")
+        rule_condition_canvas = customtkinter.CTkCanvas(self)
+        rule_condition_canvas.grid(row=4, column=1)
+        self.condition_fields = 3
+        self.add_rule_conditon_fields(rule_condition_canvas)
+        rule_condition_canvas.bind("<Configure>", lambda event: self.resize_box(rule_condition_canvas, event))
+        condition_plus_icon = get_plus_icon(self)
+        rule_canvas_plus_button = tk.Button(rule_condition_canvas, image=condition_plus_icon, width=50, height=50, command=lambda: self.add_rule_conditon_fields(rule_condition_canvas))
+        rule_canvas_plus_button.image = condition_plus_icon
+        rule_condition_canvas.create_window(10, 10, window=rule_canvas_plus_button, anchor=tk.NW)
+        
+        
+        #Action
+        rule_action_label = customtkinter.CTkLabel(self, text='Action', font=customtkinter.CTkFont(size=20, weight="bold"))
+        rule_action_label.grid(row=6, column=0, padx=5, pady=15, sticky="w")
+        rule_action_canvas = customtkinter.CTkCanvas(self)
+        rule_action_canvas.grid(row=6, column=1)
+        self.action_fields = 3
+        self.add_rule_operation_fields(rule_action_canvas)
+        rule_action_canvas.bind("<Configure>", lambda event: self.resize_box(rule_action_canvas, event))
+        action_plus_icon = get_plus_icon(self)
+        rule_canvas_plus_button = tk.Button(rule_action_canvas, image=action_plus_icon, width=50, height=50, command=lambda: self.add_rule_operation_fields(rule_action_canvas))
+        rule_canvas_plus_button.image = action_plus_icon
+        rule_action_canvas.create_window(10, 10, window=rule_canvas_plus_button, anchor=tk.NW)
+        
         
         if item_id == None:
             self.save_button = customtkinter.CTkButton(self, text="Create", command=self.create_and_close)
@@ -53,9 +79,16 @@ class RuleViewSingleWindowGUI(customtkinter.CTkToplevel):
             self.cancel_button.grid(row=len(self.fields) + 1, column=1, columnspan=1, pady=5)
             self.delete_button.grid(row=len(self.fields) + 1, column=2, columnspan=1, pady=5)
     
-    def add_rule_monitor_fields(self, master):
-        field_1 = self.add_field('Monitor_SourcePath', customtkinter.CTkEntry, group='rmf', master=master, width=150)
-        field_2 = self.add_field('Monitor_Subfolder', tk.Checkbutton, group='rmf', master=master)
+    def add_rule_monitor_fields(self, master, suffix=None):
+        field_1 = self.add_field(f'Monitor_SourcePath_{self.monitor_fields}', customtkinter.CTkEntry, sub_group=self.monitor_fields, group='rmf', master=master, width=150)
+        sfcb_key = ('group_' + str(self.monitor_fields))
+        self.subfolder_check_box[sfcb_key] = 0
+        def click_subfolder_field(group):
+            if self.subfolder_check_box[group] == 0:
+                self.subfolder_check_box[group] = 1
+            elif self.subfolder_check_box[group] == 1:
+                self.subfolder_check_box[group] = 0
+        field_2 = self.add_field(f'Monitor_Subfolder_{self.monitor_fields}', tk.Checkbutton, sub_group=self.monitor_fields, command=lambda: click_subfolder_field(sfcb_key), group='rmf', master=master)
         def askdir():
             selectedFolder = filedialog.askdirectory()
             field_1.delete(0, tk.END)
@@ -68,18 +101,37 @@ class RuleViewSingleWindowGUI(customtkinter.CTkToplevel):
         self.resize_box(master, None)
         self.monitor_fields = self.monitor_fields + 2
         
-    def add_rule_conditon_fields(self):
-        self.add_field('Condition_Operator', customtkinter.CTkEntry, label='Condition Operator', group='rcf')
-        self.add_field('Condition_Base', customtkinter.CTkEntry, label='Condition Base', group='rcf')
-        self.add_field('Condition_Operator', customtkinter.CTkEntry, label='Condition Operator', group='rcf')
-        self.add_field('Condition_Value', customtkinter.CTkEntry, label='Condition Value', group='rcf')
-        self.add_field('Value_Value', customtkinter.CTkEntry, label='Value', group='rcf')
+    def add_rule_conditon_fields(self, master):
+        field_1 = self.add_field(f'Condition_Operator_{self.condition_fields}', customtkinter.CTkOptionMenu, sub_group=self.condition_fields, master=master, group='rcf', values=['File Extension', 'File Name'])
+        field_2 = self.add_field(f'Condition_Base_{self.condition_fields}', customtkinter.CTkOptionMenu, sub_group=self.condition_fields, master=master, group='rcf', values=['Is', 'Starts With', 'Ends With'])
+        field_3 = self.add_field(f'Condition_Type_{self.condition_fields}', customtkinter.CTkOptionMenu, sub_group=self.condition_fields, master=master, group='rcf', values=['Text', 'Number'])
+        field_4 = self.add_field(f'Condition_Value_{self.condition_fields}', customtkinter.CTkEntry, sub_group=self.condition_fields, master=master, group='rcf')
+
+        y_position = self.condition_fields * 30  
+        master.create_window(10, y_position, window=field_1, anchor=tk.NW)
+        master.create_window(160, y_position, window=field_2, anchor=tk.NW)
+        master.create_window(310, y_position, window=field_3, anchor=tk.NW)
+        master.create_window(460, y_position, window=field_4, anchor=tk.NW)
+        self.resize_box(master, None)
+        self.condition_fields = self.condition_fields + 2
         
-    def add_rule_operation_fields(self):
-        self.add_field('Operation_Action', customtkinter.CTkEntry, label='Operation Action', group='rof')
-        self.add_field('Operation_ActionValue', customtkinter.CTkEntry, label='Operation Action Value', group='rof')
+    def add_rule_operation_fields(self, master):
+        field_1 = self.add_field(f'Operation_Action_{self.action_fields}', customtkinter.CTkOptionMenu, sub_group=self.action_fields, master=master, group='rof', values=['Move', 'Rename'])
+        field_2 = self.add_field(f'Operation_Action_Value_{self.action_fields}', customtkinter.CTkEntry, sub_group=self.action_fields, group='rof', master=master)
+        
+        def askdir():
+            selectedFolder = filedialog.askdirectory()
+            field_2.delete(0, tk.END)
+            field_2.insert(0, selectedFolder)
+        select_button = customtkinter.CTkButton(self, text="Select Folder", command=askdir)
+        y_position = self.action_fields * 30  
+        master.create_window(10, y_position, window=field_1, anchor=tk.NW)
+        master.create_window(160, y_position, window=field_2, anchor=tk.NW)
+        master.create_window(310, y_position, window=select_button, anchor=tk.NW)
+        self.resize_box(master, None)
+        self.action_fields = self.action_fields + 2
     
-    def add_field(self, field_name, widget_class, master=None, value=None, label=None, group=None, auto_pos=True, **widget_kwargs):
+    def add_field(self, field_name, widget_class, master=None, value=None, label=None, group=None, auto_pos=True, sub_group=None, **widget_kwargs):
         row = len(self.fields)
         if label:
             label_widget = tk.Label(self, text=label)
@@ -94,17 +146,86 @@ class RuleViewSingleWindowGUI(customtkinter.CTkToplevel):
         self.fields[field_name] = widget
         if group:
             if group not in self.grouped_fields:
-                self.grouped_fields[group] = []
-
-            self.grouped_fields[group].append(widget)
+                self.grouped_fields[group] = {}
+            if sub_group:
+                if sub_group not in self.grouped_fields[group]:
+                    self.grouped_fields[group][sub_group] = {}
+                self.grouped_fields[group][sub_group][field_name] = widget
+            else:
+                self.grouped_fields[group][field_name] = widget
         return widget
+        
+    def get_monitor_values(self):
+        monitors = []
+        rmf_ref = self.grouped_fields['rmf']
+        monitor_keys = rmf_ref.keys()
+        if len(monitor_keys) > 0:
+            for key in monitor_keys:
+                monitor_ref = rmf_ref[key]
+                monitor_path = monitor_ref[f"Monitor_SourcePath_{key}"].get()
+                sfcb_key = ('group_' + str(key))
+                monitor_subfolder = self.subfolder_check_box[sfcb_key]
+                monitors.append({
+                    'sourcepath': monitor_path,
+                    'subfolder': monitor_subfolder
+                })
+        else:
+            raise Exception("Monitors can't be empty")
+        return monitors
+        
+    def get_operation_values(self):
+        operations = []
+        rof_ref = self.grouped_fields['rof']
+        operation_keys = rof_ref.keys()
+        if len(operation_keys) > 0:
+            for key in operation_keys:
+                operation_ref = rof_ref[key]
+                operation_action = operation_ref[f"Operation_Action_{key}"].get()
+                operation_value = operation_ref[f"Operation_Action_Value_{key}"].get()
+                operations.append({
+                    'action': operation_action,
+                    'action_value': operation_value
+                })
+        else:
+            raise Exception("Operations can't be empty")
+        return operations
+    
+        
+    def get_conditions_values(self):
+        conditions = []
+        rcf_ref = self.grouped_fields['rcf']
+        condition_keys = rcf_ref.keys()
+        if len(condition_keys) > 0:
+            for key in condition_keys:
+                condition_ref = rcf_ref[key]
+                condition_op = condition_ref[f"Condition_Operator_{key}"].get()
+                condition_base = condition_ref[f"Condition_Base_{key}"].get()
+                condition_type = condition_ref[f"Condition_Type_{key}"].get()
+                condition_value = condition_ref[f"Condition_Value_{key}"].get()
+                conditions.append({
+                    'operator': condition_op,
+                    'operator_base': condition_base,
+                    'value_type': condition_type,
+                    'value': condition_value
+                })
+        else:
+            raise Exception("Conditions can't be empty")
+        return conditions
         
     def initialize_rule(self, item_id):
         pass
     
     def create_and_close(self):
-        description = self.grouped_fields['rf'][0].get()
-        rule = self.adapter.send_command('create_rule', {'id': None, 'description': description})
+        description = self.grouped_fields['rf']['Rule_Description'].get()
+        monitors = self.get_monitor_values()
+        conditions = self.get_conditions_values()
+        operations = self.get_operation_values()
+        print(description)
+        print(monitors)
+        print(conditions)
+        print(operations)
+        rule = self.adapter.send_command('create_rule', {'id': None, 'description': description, 'start': False})
+        print(rule)
         self.destroy()
 
     def save_and_close(self):
