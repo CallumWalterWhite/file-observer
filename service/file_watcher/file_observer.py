@@ -24,17 +24,17 @@ class FileObserver:
         self.observer = Observer()
 
     def on_created(self, event):
-        self.move_file(event)
+        self.handle_event(event)
 
     def on_modified(self, event):
-        self.move_file(event)
+        self.handle_event(event)
 
     def on_moved(self, event):
-        self.move_file(event, True)
+        self.handle_event(event, True)
 
     def handle_event(self, event, moved=False):
         for operation in self.__operations:
-            operation.invoke(self, event, moved)
+            operation.invoke(event, moved)
 
     def stop(self):
         self.observer.stop()

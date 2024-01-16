@@ -11,6 +11,7 @@ from app.folder_service_adapter import FolderServiceAdapter
 class RuleViewSingleWindowGUI(customtkinter.CTkToplevel):
     def __init__(self, parent, tree, item_id = None):
         super().__init__(parent)
+        self.item_id = item_id
         self.adapter = FolderServiceAdapter()
         self.fields = {}
         self.grouped_fields = {}
@@ -74,7 +75,7 @@ class RuleViewSingleWindowGUI(customtkinter.CTkToplevel):
         else:
             self.save_button = customtkinter.CTkButton(self, text="Save", command=self.save_and_close)
             self.cancel_button = customtkinter.CTkButton(self, text="Cancel", command=self.destroy)
-            self.delete_button = customtkinter.CTkButton(self, text="Delete", command=self.destroy)
+            self.delete_button = customtkinter.CTkButton(self, text="Delete", command=self.delete_and_close)
             self.save_button.grid(row=len(self.fields) + 1, column=0, columnspan=1, pady=10)
             self.cancel_button.grid(row=len(self.fields) + 1, column=1, columnspan=1, pady=5)
             self.delete_button.grid(row=len(self.fields) + 1, column=2, columnspan=1, pady=5)
@@ -220,12 +221,19 @@ class RuleViewSingleWindowGUI(customtkinter.CTkToplevel):
         monitors = self.get_monitor_values()
         conditions = self.get_conditions_values()
         operations = self.get_operation_values()
-        print(description)
-        print(monitors)
-        print(conditions)
-        print(operations)
-        rule = self.adapter.send_command('create_rule', {'id': None, 'description': description, 'start': False})
-        print(rule)
+        rule_data = self.adapter.send_command('create_rule', {'id': None, 'description': description, 'start': False})
+        rule_id = rule_data['Id']
+        for monitor in monitors:
+            self.adapter.send_command('create_rule_monitor', {'id': None, 'ruleid': rule_id, 'sourcepath': monitor['sourcepath'], 'subfolder': monitor['subfolder']})
+        for condition in conditions:
+            self.adapter.send_command('create_rule_condition', {'id': None, 'ruleid': rule_id, 'operator': condition['operator'], 'operator_base': condition['operator_base'], 'value_type': condition['value_type'], 'value': condition['value']})
+        for operation in operations:
+            self.adapter.send_command('create_rule_operation', {'id': None, 'ruleid': rule_id, 'action': operation['action'], 'action_value': operation['action_value']})
+        rule_data = self.adapter.send_command('start_rule', {'id': rule_id, 'description': description, 'start': True})
+        self.destroy()
+        
+    def delete_and_close(self):
+        self.adapter.send_command('delete_rule', {'id': self.item_id, 'description': '', 'start': False})
         self.destroy()
 
     def save_and_close(self):
@@ -260,6 +268,7 @@ class RuleViewGUI(customtkinter.CTkFrame):
         self.tree = ttk.Treeview(self, columns=columns, show="headings", selectmode="browse", style="Treeview")
         self.setup_tree(self.tree, columns)
         rules = self.adapter.send_command_request('get_all_rules_aggregate')
+        print(rules)
         for rule in rules:
             self.tree.insert("", "end", values=(rule['id'], 'True', rule['description'], len(rule['rulemonitors'])), tags=("Clickable",))
         self.tree.tag_bind("Clickable", "<ButtonRelease-1>", self.on_item_click)

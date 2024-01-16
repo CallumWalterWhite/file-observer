@@ -3,7 +3,8 @@ from enum import Enum
 
 class ConditionBase(Enum):
     NAME=1,
-    TIMER=2
+    TIMER=2,
+    EXTENSION=3
 
 class Condition(ABC):
     def __init__(self, condition):
@@ -14,8 +15,23 @@ class Condition(ABC):
         pass
 
 class ConditionName(Condition):
-    def __init__(self, pattern):
+    def __init__(self, operator, pattern_type, pattern):
         super().__init__(ConditionBase.NAME)
+        self.__operator = operator
+        self.__pattern_type = pattern_type
+        self.__pattern = pattern
+        
+    def invoke(self, event, moved):
+        pass
+    
+    def get_patterns(self):
+        print(self.__pattern_type)
+        print(self.__pattern)
+        return self.__pattern
+    
+class ConditionExtension(Condition):
+    def __init__(self, pattern):
+        super().__init__(ConditionBase.EXTENSION)
         self.__pattern = pattern
         
     def invoke(self, event, moved):

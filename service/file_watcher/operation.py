@@ -21,11 +21,16 @@ class OperationMover(Operation):
         self.__target = target
         
     def invoke(self, event, moved):
-        if moved:
-            self.__target = os.path.join(self.target, os.path.basename(event.dest_path))
-            shutil.move(event.dest_path, self.__target)
-            self.logging(f"File moved from {event.dest_path} to {self.__target}")
-        else:
-            self.__target = os.path.join(self.target, os.path.basename(event.src_path))
-            shutil.move(event.src_path, self.__target)
-            self.logging(f"File moved from {event.src_path} to {self.__target}")
+        try:
+            if moved:
+                self.__target = os.path.join(self.__target, os.path.basename(event.dest_path))
+                shutil.move(event.dest_path, self.__target)
+                #self.logging(f"File moved from {event.dest_path} to {self.__target}")
+            else:
+                self.__target = os.path.join(self.__target, os.path.basename(event.src_path))
+                shutil.move(event.src_path, self.__target)
+                #self.logging(f"File moved from {event.src_path} to {self.__target}")
+        except:
+            #INGNORE 
+            #TODO: handle errors
+            pass

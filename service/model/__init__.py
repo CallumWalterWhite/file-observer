@@ -23,32 +23,32 @@ class RuleMonitor(BaseModel):
     Id = UUIDField(primary_key=True)
     RuleId = UUIDField()
     SourcePath = CharField()
-    Subfolder: BooleanField()
+    Subfolder = BooleanField()
 
 # class RuleCondition(BaseModel):
 #     Id = UUIDField(primary_key=True)
 #     RuleId = UUIDField()
-#     AggregateOperator: CharField()
+#     AggregateOperator = CharField()
 
 class RuleCondition(BaseModel):
     Id = UUIDField(primary_key=True)
     # RuleConditionId = UUIDField()
     RuleId = UUIDField()
-    Base: CharField()
-    Operator: CharField()
-    Type: CharField()
-    Value: CharField()
+    Base = CharField()
+    Operator = CharField()
+    Type = CharField()
+    Value = CharField()
     
 class ConditionValue(BaseModel):
     Id = UUIDField(primary_key=True)
     ConditionId = UUIDField()
-    Value: CharField()
+    Value = CharField()
    
 class RuleOperation(BaseModel):
     Id = UUIDField(primary_key=True)
     RuleId = UUIDField()
-    Action: CharField()
-    ActionValue: CharField()
+    Action = CharField()
+    ActionValue = CharField()
 
 class Logs(BaseModel):
     Id = UUIDField(primary_key=True)
