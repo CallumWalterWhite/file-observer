@@ -268,7 +268,6 @@ class RuleViewGUI(customtkinter.CTkFrame):
         self.tree = ttk.Treeview(self, columns=columns, show="headings", selectmode="browse", style="Treeview")
         self.setup_tree(self.tree, columns)
         rules = self.adapter.send_command_request('get_all_rules_aggregate')
-        print(rules)
         for rule in rules:
             self.tree.insert("", "end", values=(rule['id'], 'True', rule['description'], len(rule['rulemonitors'])), tags=("Clickable",))
         self.tree.tag_bind("Clickable", "<ButtonRelease-1>", self.on_item_click)

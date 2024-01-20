@@ -2,6 +2,7 @@ import json
 import socket
 import threading
 import inspect
+import signal
 
 class TCPRequestHandler:
     def __init__(self, host, port):
@@ -53,11 +54,9 @@ class TCPRequestHandler:
                 print(f"Accepted connection from {client_address}")
                 client_thread = threading.Thread(target=self.handle_client, args=(client_socket, client_address))
                 client_thread.start()
-
-        except KeyboardInterrupt:
-            print("Server shutting down.")
         finally:
             self.server_socket.close()
 
     def stop_server(self):
+        print("Server shutting down.")
         self.server_socket.close()

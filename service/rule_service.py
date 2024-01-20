@@ -5,7 +5,7 @@ import uuid
 from service.file_watcher_manager import FileWatcherManager
 from service.object_mapper import ObjectMapper
 from service.file_watcher.condition import Condition, ConditionName, ConditionTimer, ConditionExtension
-from service.file_watcher.operation import Operation, OperationMover
+from service.file_watcher.operation import Operation, OperationMover, OperationRename
 
 def public(func):
     setattr(func, 'is_public', True)
@@ -52,7 +52,7 @@ class RuleAggregateDto(BaseDto):
 #TODO: use refelection in add request handler to remap objects when passed through to method
 
 rule_matrix = {
-    'operation': {'Move': OperationMover},
+    'operation': {'Move': OperationMover, 'Rename': OperationRename},
     'condition': {'File Name': ConditionName, 'File Extension': ConditionExtension}
 }
 

@@ -25,20 +25,32 @@ class ConditionName(Condition):
         pass
     
     def get_patterns(self):
-        print(self.__pattern_type)
-        print(self.__pattern)
-        return self.__pattern
+        if self.__operator == 'Starts With':
+            pattern_str = f'{self.__pattern}*'
+        elif self.__operator == 'Ends With':
+            pattern_str = f'{self.__pattern}'
+        else:
+            pattern_str = f'{self.__pattern}*'
+        return pattern_str
     
 class ConditionExtension(Condition):
-    def __init__(self, pattern):
+    def __init__(self, operator, pattern_type, pattern):
         super().__init__(ConditionBase.EXTENSION)
+        self.__operator = operator
+        self.__pattern_type = pattern_type
         self.__pattern = pattern
         
     def invoke(self, event, moved):
         pass
     
     def get_patterns(self):
-        return self.__pattern
+        if self.__operator == 'Starts With':
+            pattern_str = f'.{self.__pattern}*'
+        elif self.__operator == 'Ends With':
+            pattern_str = f'.*{self.__pattern}'
+        else:
+            pattern_str = f'.{self.__pattern}'
+        return pattern_str
     
 class ConditionTimer(Condition):
     def __init__(self, age):

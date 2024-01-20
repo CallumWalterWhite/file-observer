@@ -1,6 +1,6 @@
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
-from service.file_watcher.condition import ConditionName
+from service.file_watcher.condition import Condition
 
 class FileObserver:
     def __init__(self, source_id, source_hash, source, ignore_directories, operations, conditions):
@@ -9,7 +9,8 @@ class FileObserver:
         self.__operations = operations
         self.__conditions = conditions
         patterns=[]
-        for pattern in [condition.get_patterns() for condition in [condition for condition in self.__conditions if isinstance(condition, ConditionName)]]:
+        for pattern in [condition.get_patterns() for condition in [condition for condition in self.__conditions if isinstance(condition, Condition)]]:
+            print(pattern)
             patterns.append(pattern)
         ignore_patterns = None
         case_sensitive = False
@@ -33,7 +34,7 @@ class FileObserver:
         self.handle_event(event, True)
 
     def handle_event(self, event, moved=False):
-        for operation in self.__operations:
+        for operation in sorted(self.__operations, key=lambda operation: operation.get_rule()):
             operation.invoke(event, moved)
 
     def stop(self):
